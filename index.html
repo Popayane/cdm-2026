@@ -31,7 +31,11 @@
   h2{font-size:1.1rem;margin:24px 0 10px;border-left:3px solid var(--accent);padding-left:10px}
   h2:first-child{margin-top:6px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0;box-shadow:var(--shadow)}
-  .news ul{margin:0;padding:0} .news li{margin:8px 0;list-style:none}
+  .news ul{margin:0;padding:0} .news li{margin:3px 0;list-style:none}
+  .news a.newsitem{display:block;text-decoration:none;color:var(--txt);padding:7px 30px 7px 8px;margin:0 -8px;border-radius:8px;position:relative}
+  .news a.newsitem:hover{background:var(--card2)}
+  .news a.newsitem::after{content:"↗";position:absolute;right:8px;top:7px;color:var(--accent2);font-weight:700;opacity:.55}
+  .news a.newsitem:hover::after{opacity:1}
   .tag{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:7px;letter-spacing:.03em}
   .t-inj{background:#fde8e8;color:var(--red)} .t-form{background:#e6f0fe;color:var(--accent2)}
   .t-key{background:#e3f7ec;color:var(--accent-d)} .t-watch{background:#fdf0db;color:var(--warn)}
@@ -107,13 +111,13 @@
     </div>
     <h2>📰 L'actu en bref</h2>
     <div class="card news"><ul>
-      <li><span class="tag t-key">CADRE</span>Coup d'envoi <b>demain jeudi 11 juin</b> : Mexique–Afrique du Sud à l'Estadio Azteca (sold-out, ~2 250 m d'altitude). Finale le <b>19 juillet</b> au MetLife Stadium. Premier Mondial à 48 équipes, 104 matchs.</li>
-      <li><span class="tag t-inj">BLESSURE</span><b>Brésil</b> : Wesley forfait, remplacé par Ederson ; Estêvão écarté (ischio). Arrière droit fragilisé.</li>
-      <li><span class="tag t-inj">BLESSURE</span><b>Japon</b> : Kaoru Mitoma forfait pour tout le tournoi (ischio) — coup dur avant Pays-Bas.</li>
-      <li><span class="tag t-inj">BLESSURE</span><b>Pays-Bas</b> : Jurrien Timber pas remis, remplacé par Lutsharel Geertruida.</li>
-      <li><span class="tag t-inj">BLESSURE</span><b>USA</b> : Chris Richards (cheville) incertain avant Paraguay, présence non remise en cause.</li>
-      <li><span class="tag t-form">FORME</span><b>USA</b> : défaite 2-1 vs Allemagne en préparation ; doutes autour du groupe de Pochettino.</li>
-      <li><span class="tag t-watch">À SUIVRE</span><b>Mbappé</b> à 5 buts du record de Klose (16) en Coupe du Monde.</li>
+      <li><a class="newsitem" href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures" target="_blank" rel="noopener"><span class="tag t-key">CADRE</span>Coup d'envoi <b>demain jeudi 11 juin</b> : Mexique–Afrique du Sud à l'Estadio Azteca (sold-out, ~2 250 m d'altitude). Finale le <b>19 juillet</b> au MetLife Stadium. Premier Mondial à 48 équipes, 104 matchs.</a></li>
+      <li><a class="newsitem" href="https://www.espn.com/soccer/story/_/id/48572979/2026-fifa-world-cup-injuries-tracker-which-stars-miss-latest-info" target="_blank" rel="noopener"><span class="tag t-inj">BLESSURE</span><b>Brésil</b> : Wesley forfait, remplacé par Ederson ; Estêvão écarté (ischio). Arrière droit fragilisé.</a></li>
+      <li><a class="newsitem" href="https://www.espn.com/soccer/story/_/id/48572979/2026-fifa-world-cup-injuries-tracker-which-stars-miss-latest-info" target="_blank" rel="noopener"><span class="tag t-inj">BLESSURE</span><b>Japon</b> : Kaoru Mitoma forfait pour tout le tournoi (ischio) — coup dur avant Pays-Bas.</a></li>
+      <li><a class="newsitem" href="https://www.espn.com/soccer/story/_/id/48572979/2026-fifa-world-cup-injuries-tracker-which-stars-miss-latest-info" target="_blank" rel="noopener"><span class="tag t-inj">BLESSURE</span><b>Pays-Bas</b> : Jurrien Timber pas remis, remplacé par Lutsharel Geertruida.</a></li>
+      <li><a class="newsitem" href="https://www.espn.com/soccer/story/_/id/48572979/2026-fifa-world-cup-injuries-tracker-which-stars-miss-latest-info" target="_blank" rel="noopener"><span class="tag t-inj">BLESSURE</span><b>USA</b> : Chris Richards (cheville) incertain avant Paraguay, présence non remise en cause.</a></li>
+      <li><a class="newsitem" href="https://sports.yahoo.com/soccer/live/2026-world-cup-news-live-updates-injuries-squads-storylines-as-the-tournament-looms-200000776.html" target="_blank" rel="noopener"><span class="tag t-form">FORME</span><b>USA</b> : défaite 2-1 vs Allemagne en préparation ; doutes autour du groupe de Pochettino.</a></li>
+      <li><a class="newsitem" href="https://www.foxsports.com/stories/soccer/world-cup-2026-champion-odds" target="_blank" rel="noopener"><span class="tag t-watch">À SUIVRE</span><b>Mbappé</b> à 5 buts du record de Klose (16) en Coupe du Monde.</a></li>
     </ul></div>
     <h2>⭐ Favoris en un coup d'œil</h2>
     <div class="card"><table>
