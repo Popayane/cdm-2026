@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CDM 2026 — Centre de pronostics</title>
+<style>
+  :root{
+    --bg:#f3f6fb; --card:#ffffff; --card2:#f7f9fc; --line:#e3e9f2; --txt:#1b2433;
+    --muted:#677488; --accent:#0fa75a; --accent-d:#0b7d43; --accent2:#2563eb;
+    --warn:#e08a13; --red:#d83a3a; --shadow:0 1px 3px rgba(20,40,80,.06),0 1px 2px rgba(20,40,80,.04);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px}
+  header{background:linear-gradient(135deg,#13a85a,#0c8f4c);color:#fff;padding:22px 0 16px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand h1{margin:0;font-size:1.35rem;letter-spacing:.2px}
+  .brand .ball{font-size:1.8rem}
+  .sub{color:#d8f5e6;font-size:.85rem;margin-top:4px}
+  nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .tabs{display:flex;max-width:860px;margin:0 auto;padding:0 8px;gap:2px;overflow-x:auto}
+  .tab{flex:0 0 auto;padding:13px 15px;color:var(--muted);font-weight:600;font-size:.9rem;
+    cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;white-space:nowrap}
+  .tab:hover{color:var(--txt)}
+  .tab.active{color:var(--accent-d);border-bottom-color:var(--accent)}
+  .view{display:none;padding:18px 0 70px}
+  .view.active{display:block}
+  h2{font-size:1.1rem;margin:24px 0 10px;border-left:3px solid var(--accent);padding-left:10px}
+  h2:first-child{margin-top:6px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0;box-shadow:var(--shadow)}
+  .news ul{margin:0;padding:0} .news li{margin:8px 0;list-style:none}
+  .tag{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:7px;letter-spacing:.03em}
+  .t-inj{background:#fde8e8;color:var(--red)} .t-form{background:#e6f0fe;color:var(--accent2)}
+  .t-key{background:#e3f7ec;color:var(--accent-d)} .t-watch{background:#fdf0db;color:var(--warn)}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+  td.p{font-weight:700;color:var(--accent-d)}
+  .rank{color:var(--muted);width:26px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+  .chip{padding:6px 13px;border-radius:20px;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);font-size:.83rem;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .daygroup{margin:18px 0 6px;font-size:.8rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .match{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden;box-shadow:var(--shadow)}
+  .mhead{padding:13px 15px;cursor:pointer;display:flex;flex-direction:column;gap:7px}
+  .mtop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .vs{font-weight:700;font-size:1.02rem}
+  .grp{font-size:.7rem;color:var(--muted);background:var(--card2);border:1px solid var(--line);padding:2px 8px;border-radius:6px;font-weight:700}
+  .meta{font-size:.8rem;color:var(--muted)}
+  .bar{display:flex;height:24px;border-radius:6px;overflow:hidden;font-size:.7rem;font-weight:700;margin-top:2px;border:1px solid var(--line)}
+  .bar span{display:flex;align-items:center;justify-content:center;white-space:nowrap}
+  .b1{background:var(--accent);color:#fff} .bx{background:#cdd6e3;color:#41506a} .b2{background:var(--warn);color:#fff}
+  .nobar{font-size:.8rem;color:var(--muted);font-style:italic}
+  .chev{color:var(--muted);font-size:.8rem;transition:transform .2s;display:inline-block}
+  .match.open .chev{transform:rotate(180deg)}
+  .mbody{display:none;border-top:1px solid var(--line);padding:14px 15px;background:var(--card2)}
+  .match.open .mbody{display:block}
+  .pred{font-size:.87rem;margin:5px 0} .pred b{color:var(--txt)}
+  .badge-win{display:inline-block;font-size:.72rem;font-weight:700;color:var(--accent-d);background:#e3f7ec;border:1px solid #bce8cf;padding:2px 9px;border-radius:20px}
+  .lineups{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .lineup{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .lineup h4{margin:0 0 7px;font-size:.85rem}
+  .lineup ol{margin:0;padding-left:18px;font-size:.82rem} .lineup li{margin:2px 0}
+  .lineup .pending{color:var(--muted);font-style:italic;font-size:.82rem}
+  .compo-flag{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:6px;margin-top:8px}
+  .compo-yes{background:#e3f7ec;color:var(--accent-d)} .compo-no{background:#eef1f6;color:var(--muted)}
+  .note{font-size:.8rem;color:var(--muted);background:#eef3fa;border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin:14px 0}
+  .empty{color:var(--muted);font-style:italic}
+  .src{font-size:.78rem;color:var(--muted);margin-top:8px} .src a{color:var(--accent2);text-decoration:none}
+  footer{border-top:1px solid var(--line);padding:16px 0 30px;color:var(--muted);font-size:.78rem}
+  /* standings */
+  .stand{margin:14px 0}
+  .stand h3{font-size:.92rem;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .stand .gl{font-size:.7rem;color:#fff;background:var(--accent);border-radius:5px;padding:2px 7px;font-weight:700}
+  .stand table{font-size:.84rem} .stand td,.stand th{padding:6px 6px;text-align:center}
+  .stand td:first-child,.stand th:first-child{text-align:left}
+  .stand td.team{font-weight:600}
+  @media(max-width:560px){.lineups{grid-template-columns:1fr}.stand table{font-size:.78rem}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand"><span class="ball">⚽</span><div>
+    <h1>CDM 2026 — Centre de pronostics</h1>
+    <div class="sub" id="edition">Édition du mercredi 10 juin 2026 · mise à jour 2×/jour (8h & 20h)</div>
+  </div></div>
+</div></header>
+
+<nav><div class="tabs">
+  <button class="tab active" data-view="accueil">🏠 Accueil</button>
+  <button class="tab" data-view="matchs">📅 Matchs &amp; compos</button>
+  <button class="tab" data-view="pronostics">🎯 Pronostics</button>
+  <button class="tab" data-view="classements">📋 Classements</button>
+  <button class="tab" data-view="resultats">📊 Résultats</button>
+</div></nav>
+
+<div class="wrap">
+
+  <!-- ============ ACCUEIL ============ -->
+  <section class="view active" id="accueil">
+    <div class="note">
+      <b>Aucun chiffre inventé — agrégation multi-sources.</b> Chaque pronostic combine plusieurs bookmakers (FanDuel, bet365, DraftKings) <i>et</i> plusieurs modèles (Dimers, SportsCasting « supercomputer », Kalshi, Forebet, KickOff). Les % sont une moyenne de consensus, marge des opérateurs comprise : ils donnent l'ordre des favoris, pas une certitude.
+    </div>
+    <h2>📰 L'actu en bref</h2>
+    <div class="card news"><ul>
+      <li><span class="tag t-key">CADRE</span>Coup d'envoi <b>demain jeudi 11 juin</b> : Mexique–Afrique du Sud à l'Estadio Azteca (sold-out, ~2 250 m d'altitude). Finale le <b>19 juillet</b> au MetLife Stadium. Premier Mondial à 48 équipes, 104 matchs.</li>
+      <li><span class="tag t-inj">BLESSURE</span><b>Brésil</b> : Wesley forfait, remplacé par Ederson ; Estêvão écarté (ischio). Arrière droit fragilisé.</li>
+      <li><span class="tag t-inj">BLESSURE</span><b>Japon</b> : Kaoru Mitoma forfait pour tout le tournoi (ischio) — coup dur avant Pays-Bas.</li>
+      <li><span class="tag t-inj">BLESSURE</span><b>Pays-Bas</b> : Jurrien Timber pas remis, remplacé par Lutsharel Geertruida.</li>
+      <li><span class="tag t-inj">BLESSURE</span><b>USA</b> : Chris Richards (cheville) incertain avant Paraguay, présence non remise en cause.</li>
+      <li><span class="tag t-form">FORME</span><b>USA</b> : défaite 2-1 vs Allemagne en préparation ; doutes autour du groupe de Pochettino.</li>
+      <li><span class="tag t-watch">À SUIVRE</span><b>Mbappé</b> à 5 buts du record de Klose (16) en Coupe du Monde.</li>
+    </ul></div>
+    <h2>⭐ Favoris en un coup d'œil</h2>
+    <div class="card"><table>
+      <tr><th class="rank">#</th><th>Vainqueur final</th><th>Proba</th></tr>
+      <tr><td class="rank">1</td><td>🇪🇸 Espagne</td><td class="p">17,4 %</td></tr>
+      <tr><td class="rank">2</td><td>🇫🇷 France</td><td class="p">16,7 %</td></tr>
+      <tr><td class="rank">3</td><td>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</td><td class="p">13,3 %</td></tr>
+    </table>
+    <div class="src">Classement complet + pronos de tous les matchs dans l'onglet <b>Pronostics</b>.</div></div>
+  </section>
+
+  <!-- ============ MATCHS & COMPOS ============ -->
+  <section class="view" id="matchs">
+    <h2>📅 Matchs à venir &amp; compositions</h2>
+    <div class="note">Touche un match pour voir le lieu et les <b>compositions d'équipe</b>. Les compos officielles sortent ≈1h avant le coup d'envoi : elles s'affichent automatiquement dès leur publication. Les pronostics détaillés sont dans l'onglet <b>Pronostics</b>.</div>
+    <div class="filters" id="dayFilters"></div>
+    <div id="matchList"></div>
+  </section>
+
+  <!-- ============ PRONOSTICS ============ -->
+  <section class="view" id="pronostics">
+    <h2>🎯 Pronostics — tous les matchs</h2>
+    <div class="note">Pour chaque match : probabilité <b>Victoire / Nul / Défaite</b> (consensus multi-sources), <b>score exact</b> le plus probable et <b>principal danger offensif</b>. Touche un match pour les détails.</div>
+    <div class="filters" id="dayFiltersP"></div>
+    <div id="predList"></div>
+
+    <h2>🏆 Vainqueur final — top favoris</h2>
+    <div class="card"><table>
+      <tr><th class="rank">#</th><th>Équipe</th><th>Cote</th><th>Proba*</th></tr>
+      <tr><td class="rank">1</td><td>🇪🇸 Espagne</td><td>+475</td><td class="p">17,4 %</td></tr>
+      <tr><td class="rank">2</td><td>🇫🇷 France</td><td>+500</td><td class="p">16,7 %</td></tr>
+      <tr><td class="rank">3</td><td>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre</td><td>+650</td><td class="p">13,3 %</td></tr>
+      <tr><td class="rank">4</td><td>🇧🇷 Brésil</td><td>+850</td><td class="p">10,5 %</td></tr>
+      <tr><td class="rank">5</td><td>🇦🇷 Argentine</td><td>+900</td><td class="p">10,0 %</td></tr>
+      <tr><td class="rank">6</td><td>🇵🇹 Portugal</td><td>+1000</td><td class="p">9,1 %</td></tr>
+      <tr><td class="rank">7</td><td>🇩🇪 Allemagne</td><td>+1400</td><td class="p">6,7 %</td></tr>
+      <tr><td class="rank">8</td><td>🇳🇱 Pays-Bas</td><td>+2200</td><td class="p">4,3 %</td></tr>
+      <tr><td class="rank">9</td><td>🇳🇴 Norvège / 🇧🇪 Belgique</td><td>+3500</td><td class="p">2,8 %</td></tr>
+    </table><div class="src">*Proba brute de marge (FanDuel, 2 juin 2026).</div></div>
+
+    <h2>🥇 Soulier d'Or — meilleur buteur</h2>
+    <div class="card"><table>
+      <tr><th class="rank">#</th><th>Joueur</th><th>Cote</th><th>Proba</th></tr>
+      <tr><td class="rank">1</td><td>Kylian Mbappé 🇫🇷</td><td>+600</td><td class="p">14,3 %</td></tr>
+      <tr><td class="rank">2</td><td>Harry Kane 🏴󠁧󠁢󠁥󠁮󠁧󠁿</td><td>+700</td><td class="p">12,5 %</td></tr>
+      <tr><td class="rank">3</td><td>Erling Haaland 🇳🇴</td><td>+1400</td><td class="p">6,7 %</td></tr>
+      <tr><td class="rank">4</td><td>Lionel Messi 🇦🇷</td><td>+1600</td><td class="p">5,9 %</td></tr>
+    </table><div class="src">Cotes Soulier d'Or, début juin 2026. Mbappé tenant du titre (8 buts en 2022).</div></div>
+  </section>
+
+  <!-- ============ CLASSEMENTS ============ -->
+  <section class="view" id="classements">
+    <h2>📋 Classements des groupes</h2>
+    <div class="note">Les 12 groupes (A→L). Tout est à 0 avant le coup d'envoi ; les points, buts et différence se mettent à jour automatiquement après chaque match joué. Les 2 premiers de chaque groupe + les 8 meilleurs 3ᵉˢ se qualifient.</div>
+    <div id="standings"></div>
+  </section>
+
+  <!-- ============ RESULTATS ============ -->
+  <section class="view" id="resultats">
+    <h2>📊 Résultats</h2>
+    <div class="card"><p class="empty" id="resultsEmpty">Aucun match encore joué — la compétition débute le 11 juin. Les scores finaux et buteurs apparaîtront ici dès le coup d'envoi.</p>
+    <div id="resultsList"></div></div>
+  </section>
+
+  <footer>
+    <div><b>Sources (agrégées) :</b>
+      <a href="https://www.foxsports.com/stories/soccer/world-cup-2026-champion-odds">FOX — vainqueur</a> ·
+      <a href="https://www.dimers.com/bet-hub/swc">Dimers</a> ·
+      <a href="https://www.sportscasting.com/">SportsCasting</a> ·
+      <a href="https://defirate.com/prediction-markets/world-cup-odds/">Kalshi/Polymarket</a> ·
+      <a href="https://www.forebet.com/">Forebet</a> ·
+      <a href="https://www.espn.com/soccer/story/_/id/48572979/2026-fifa-world-cup-injuries-tracker-which-stars-miss-latest-info">ESPN — blessures</a> ·
+      <a href="https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/scores-fixtures">FIFA — fixtures</a>
+    </div>
+    <div style="margin-top:8px">App générée automatiquement · cotes & compositions rafraîchies à chaque édition (8h & 20h). Fichier autonome : une copie partagée ne se met pas à jour seule.</div>
+  </footer>
+</div>
+
+<script>
+// ===== GROUPES (A→L) =====
+const GROUPS = {
+  A:["🇲🇽 Mexique","🇿🇦 Afrique du Sud","🇰🇷 Corée du Sud","🇨🇿 Tchéquie"],
+  B:["🇨🇦 Canada","🇨🇭 Suisse","🇶🇦 Qatar","🇧🇦 Bosnie-Herz."],
+  C:["🇧🇷 Brésil","🇲🇦 Maroc","🇭🇹 Haïti","🏴󠁧󠁢󠁳󠁣󠁴󠁿 Écosse"],
+  D:["🇺🇸 États-Unis","🇵🇾 Paraguay","🇦🇺 Australie","🇹🇷 Turquie"],
+  E:["🇩🇪 Allemagne","🇨🇼 Curaçao","🇨🇮 Côte d'Ivoire","🇪🇨 Équateur"],
+  F:["🇳🇱 Pays-Bas","🇯🇵 Japon","🇸🇪 Suède","🇹🇳 Tunisie"],
+  G:["🇧🇪 Belgique","🇪🇬 Égypte","🇮🇷 Iran","🇳🇿 Nouvelle-Zélande"],
+  H:["🇪🇸 Espagne","🇨🇻 Cap-Vert","🇸🇦 Arabie saoudite","🇺🇾 Uruguay"],
+  I:["🇫🇷 France","🇸🇳 Sénégal","🇳🇴 Norvège","🇮🇶 Irak"],
+  J:["🇦🇷 Argentine","🇩🇿 Algérie","🇦🇹 Autriche","🇯🇴 Jordanie"],
+  K:["🇵🇹 Portugal","🇺🇿 Ouzbékistan","🇨🇴 Colombie","🇨🇩 RD Congo"],
+  L:["🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angleterre","🇭🇷 Croatie","🇬🇭 Ghana","🇵🇦 Panama"]
+};
+// stats par équipe (mises à jour par la tâche) : {team:{j,g,n,p,bp,bc,pts}}
+const STANDINGS = {};
+
+// ===== MATCHS =====
+// pred {home,draw,away} en % | score string | scorer (danger offensif) | lineups {home:[],away:[]}
+const MATCHES = [
+  {day:"Jeudi 11 juin",grp:"A",home:"🇲🇽 Mexique",away:"🇿🇦 Afrique du Sud",venue:"Estadio Azteca, Mexico City",pred:{home:67,draw:18,away:15},score:"1–0 Mexique",scorer:"R. Jiménez / S. Giménez",lineups:{home:[],away:[]}},
+  {day:"Jeudi 11 juin",grp:"A",home:"🇰🇷 Corée du Sud",away:"🇨🇿 Tchéquie",venue:"Estadio Akron, Guadalajara",pred:{home:38,draw:31,away:31},score:"1–1",scorer:"Son Heung-min",lineups:{home:[],away:[]}},
+  {day:"Vendredi 12 juin",grp:"B",home:"🇨🇦 Canada",away:"🇧🇦 Bosnie-Herzégovine",venue:"BMO Field, Toronto",pred:{home:55,draw:25,away:20},score:"1–0 Canada",scorer:"Jonathan David",lineups:{home:[],away:[]}},
+  {day:"Vendredi 12 juin",grp:"D",home:"🇺🇸 États-Unis",away:"🇵🇾 Paraguay",venue:"SoFi Stadium, Inglewood",pred:{home:50,draw:27,away:23},score:"1–0 États-Unis",scorer:"C. Pulisic / F. Balogun",lineups:{home:[],away:[]}},
+  {day:"Samedi 13 juin",grp:"B",home:"🇶🇦 Qatar",away:"🇨🇭 Suisse",venue:"Levi's Stadium, Santa Clara",pred:{home:8,draw:14,away:78},score:"0–2 Suisse",scorer:"Suisse : danger offensif (à confirmer)",lineups:{home:[],away:[]}},
+  {day:"Samedi 13 juin",grp:"C",home:"🇧🇷 Brésil",away:"🇲🇦 Maroc",venue:"MetLife Stadium, East Rutherford",pred:{home:59,draw:24,away:17},score:"2–1 Brésil",scorer:"Vinícius Jr / Raphinha",lineups:{home:[],away:[]}},
+  {day:"Samedi 13 juin",grp:"C",home:"🇭🇹 Haïti",away:"🏴󠁧󠁢󠁳󠁣󠁴󠁿 Écosse",venue:"Gillette Stadium, Foxborough",pred:{home:16,draw:21,away:63},score:"0–1 Écosse",scorer:"Écosse : C. Adams / McTominay",lineups:{home:[],away:[]}},
+  {day:"Samedi 13 juin",grp:"D",home:"🇦🇺 Australie",away:"🇹🇷 Turquie",venue:"BC Place, Vancouver",pred:{home:20,draw:26,away:54},score:"0–1 Turquie",scorer:"Turquie : Arda Güler (à confirmer)",lineups:{home:[],away:[]}},
+  {day:"Dimanche 14 juin",grp:"E",home:"🇩🇪 Allemagne",away:"🇨🇼 Curaçao",venue:"NRG Stadium, Houston",pred:{home:90,draw:7,away:3},score:"3–0 Allemagne",scorer:"Wirtz / Musiala",lineups:{home:[],away:[]}},
+  {day:"Dimanche 14 juin",grp:"F",home:"🇳🇱 Pays-Bas",away:"🇯🇵 Japon",venue:"AT&T Stadium, Arlington",pred:{home:52,draw:24,away:24},score:"1–1 / 2–1 Pays-Bas",scorer:"Depay / Gakpo",lineups:{home:[],away:[]}},
+  {day:"Dimanche 14 juin",grp:"E",home:"🇨🇮 Côte d'Ivoire",away:"🇪🇨 Équateur",venue:"Philadelphia",pred:{home:28,draw:33,away:39},score:"0–1 Équateur",scorer:"Équateur : danger offensif (à confirmer)",lineups:{home:[],away:[]}},
+  {day:"Dimanche 14 juin",grp:"F",home:"🇸🇪 Suède",away:"🇹🇳 Tunisie",venue:"Guadalajara",pred:{home:50,draw:28,away:22},score:"2–1 Suède",scorer:"A. Isak / V. Gyökeres",lineups:{home:[],away:[]}},
+  {day:"Lundi 15 juin",grp:"H",home:"🇪🇸 Espagne",away:"🇨🇻 Cap-Vert",venue:"Mercedes-Benz Stadium, Atlanta",pred:{home:87,draw:9,away:4},score:"2–0 Espagne",scorer:"L. Yamal / Oyarzabal",lineups:{home:[],away:[]}},
+  {day:"Lundi 15 juin",grp:"G",home:"🇧🇪 Belgique",away:"🇪🇬 Égypte",venue:"Seattle",pred:{home:60,draw:23,away:17},score:"1–0 Belgique",scorer:"Belgique : Lukaku / De Bruyne",lineups:{home:[],away:[]}},
+  {day:"Lundi 15 juin",grp:"H",home:"🇸🇦 Arabie saoudite",away:"🇺🇾 Uruguay",venue:"Hard Rock Stadium, Miami Gardens",pred:{home:12,draw:22,away:66},score:"0–1 Uruguay",scorer:"Uruguay : D. Núñez / Valverde",lineups:{home:[],away:[]}},
+  {day:"Lundi 15 juin",grp:"G",home:"🇮🇷 Iran",away:"🇳🇿 Nouvelle-Zélande",venue:"Inglewood",pred:{home:53,draw:27,away:20},score:"1–0 Iran",scorer:"Mehdi Taremi",lineups:{home:[],away:[]}},
+  {day:"Mardi 16 juin",grp:"I",home:"🇫🇷 France",away:"🇸🇳 Sénégal",venue:"MetLife Stadium, East Rutherford",pred:{home:64,draw:22,away:14},score:"2–0 France",scorer:"Kylian Mbappé",lineups:{home:[],away:[]}},
+  {day:"Mardi 16 juin",grp:"I",home:"🇮🇶 Irak",away:"🇳🇴 Norvège",venue:"Gillette Stadium, Foxborough",pred:{home:6,draw:14,away:80},score:"0–2 Norvège",scorer:"Erling Haaland",lineups:{home:[],away:[]}},
+  {day:"Mardi 16 juin",grp:"J",home:"🇦🇷 Argentine",away:"🇩🇿 Algérie",venue:"Arrowhead Stadium, Kansas City",pred:{home:70,draw:21,away:9},score:"2–0 Argentine",scorer:"Messi / J. Álvarez / Lautaro",lineups:{home:[],away:[]}},
+  {day:"Mardi 16 juin",grp:"J",home:"🇦🇹 Autriche",away:"🇯🇴 Jordanie",venue:"Levi's Stadium, Santa Clara",pred:{home:73,draw:17,away:10},score:"2–0 Autriche",scorer:"M. Arnautović",lineups:{home:[],away:[]}}
+];
+
+// ===== HELPERS =====
+function winnerLabel(m){
+  if(!m.pred) return null;
+  const{home,draw,away}=m.pred;
+  if(home>=away&&home>=draw) return {name:m.home,pct:home};
+  if(away>=home&&away>=draw) return {name:m.away,pct:away};
+  return {name:"Nul",pct:draw};
+}
+
+// ===== ONGLET MATCHS (compos) =====
+const days=[...new Set(MATCHES.map(m=>m.day))];
+let activeDay="all", activeDayP="all";
+function shortDay(d){const p=d.split(" ");return p[0]+" "+p[1];}
+function buildFilters(box,active,setter){
+  box.innerHTML="";
+  const mk=(label,val)=>{const b=document.createElement('button');b.className='chip'+(val===active()?' active':'');b.textContent=label;b.onclick=()=>setter(val);box.appendChild(b);};
+  mk('Tous','all'); days.forEach(d=>mk(shortDay(d),d));
+}
+function renderMatches(){
+  buildFilters(document.getElementById('dayFilters'),()=>activeDay,v=>{activeDay=v;renderMatches();});
+  const box=document.getElementById('matchList');box.innerHTML="";
+  let cur="";
+  MATCHES.filter(m=>activeDay==="all"||m.day===activeDay).forEach(m=>{
+    if(m.day!==cur){cur=m.day;const h=document.createElement('div');h.className='daygroup';h.textContent=m.day;box.appendChild(h);}
+    box.appendChild(matchCompoCard(m));
+  });
+}
+function matchCompoCard(m){
+  const el=document.createElement('div');el.className='match';
+  const win=winnerLabel(m);
+  const hasCompo=m.lineups.home.length>0||m.lineups.away.length>0;
+  const col=(name,arr)=>arr.length>0
+    ? `<div class="lineup"><h4>${name}</h4><ol>${arr.map(p=>`<li>${p}</li>`).join('')}</ol></div>`
+    : `<div class="lineup"><h4>${name}</h4><div class="pending">Composition en attente — annoncée <b>${m.day}</b>, ≈1h avant le coup d'envoi</div></div>`;
+  el.innerHTML=`
+    <div class="mhead">
+      <div class="mtop"><span class="vs">${m.home} – ${m.away}</span>
+        <span><span class="grp">Gr. ${m.grp}</span> <span class="chev">▾</span></span></div>
+      <div class="meta">📍 ${m.venue}${win?` · favori : <b>${win.name}</b> (${win.pct}%)`:''}</div>
+    </div>
+    <div class="mbody">
+      <span class="compo-flag ${hasCompo?'compo-yes':'compo-no'}">${hasCompo?'✓ Compositions disponibles':'⏳ Compositions en attente'}</span>
+      <div class="lineups">${col(m.home,m.lineups.home)}${col(m.away,m.lineups.away)}</div>
+    </div>`;
+  el.querySelector('.mhead').onclick=()=>el.classList.toggle('open');
+  return el;
+}
+
+// ===== ONGLET PRONOSTICS =====
+function renderPreds(){
+  buildFilters(document.getElementById('dayFiltersP'),()=>activeDayP,v=>{activeDayP=v;renderPreds();});
+  const box=document.getElementById('predList');box.innerHTML="";
+  let cur="";
+  MATCHES.filter(m=>activeDayP==="all"||m.day===activeDayP).forEach(m=>{
+    if(m.day!==cur){cur=m.day;const h=document.createElement('div');h.className='daygroup';h.textContent=m.day;box.appendChild(h);}
+    box.appendChild(predCard(m));
+  });
+}
+function predCard(m){
+  const el=document.createElement('div');el.className='match';
+  let bar=m.pred
+    ? `<div class="bar"><span class="b1" style="width:${m.pred.home}%">${m.pred.home}%</span><span class="bx" style="width:${m.pred.draw}%">${m.pred.draw}%</span><span class="b2" style="width:${m.pred.away}%">${m.pred.away}%</span></div>`
+    : `<div class="nobar">Pronostic à venir</div>`;
+  const win=winnerLabel(m);
+  el.innerHTML=`
+    <div class="mhead">
+      <div class="mtop"><span class="vs">${m.home} – ${m.away}</span>
+        <span><span class="grp">Gr. ${m.grp}</span> <span class="chev">▾</span></span></div>
+      ${bar}
+    </div>
+    <div class="mbody">
+      <div class="pred">${win?`<span class="badge-win">Vainqueur probable : ${win.name} (${win.pct}%)</span>`:''}</div>
+      <div class="pred"><b>Score exact le + probable :</b> ${m.score||'—'}</div>
+      <div class="pred"><b>Principal danger offensif :</b> ${m.scorer||'—'} <span style="color:var(--muted)">(à confirmer aux compos)</span></div>
+      <div class="pred" style="color:var(--muted);font-size:.8rem">Légende barre : <b style="color:var(--accent-d)">vert</b> ${m.home.replace(/^[^ ]+ /,'')} · gris nul · <b style="color:var(--warn)">orange</b> ${m.away.replace(/^[^ ]+ /,'')}</div>
+    </div>`;
+  el.querySelector('.mhead').onclick=()=>el.classList.toggle('open');
+  return el;
+}
+
+// ===== ONGLET CLASSEMENTS =====
+function renderStandings(){
+  const box=document.getElementById('standings');box.innerHTML="";
+  Object.keys(GROUPS).forEach(g=>{
+    const rows=GROUPS[g].map(team=>{
+      const s=STANDINGS[team]||{j:0,g:0,n:0,p:0,bp:0,bc:0,pts:0};
+      const diff=(s.bp-s.bc); const ds=(diff>0?'+':'')+diff;
+      return {team,...s,diff};
+    }).sort((a,b)=>b.pts-a.pts||b.diff-a.diff||b.bp-a.bp);
+    const div=document.createElement('div');div.className='stand card';
+    div.innerHTML=`<h3><span class="gl">Groupe ${g}</span></h3>
+      <table><tr><th>Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th>BP</th><th>BC</th><th>Diff</th><th>Pts</th></tr>
+      ${rows.map(r=>`<tr><td class="team">${r.team}</td><td>${r.j}</td><td>${r.g}</td><td>${r.n}</td><td>${r.p}</td><td>${r.bp}</td><td>${r.bc}</td><td>${(r.diff>0?'+':'')+r.diff}</td><td><b>${r.pts}</b></td></tr>`).join('')}
+      </table>`;
+    box.appendChild(div);
+  });
+}
+
+// ===== RESULTATS =====
+function renderResults(){
+  const played=MATCHES.filter(m=>m.final===true);
+  if(played.length===0)return;
+  document.getElementById('resultsEmpty').style.display='none';
+  document.getElementById('resultsList').innerHTML=played.map(m=>`<div class="pred"><b>${m.home} ${m.score} ${m.away}</b>${m.scorerFinal?` — ${m.scorerFinal}`:''}</div>`).join('');
+}
+
+// ===== TABS =====
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');document.getElementById(t.dataset.view).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+});
+
+renderMatches(); renderPreds(); renderStandings(); renderResults();
+</script>
+</body>
+</html>
