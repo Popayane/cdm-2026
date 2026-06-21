@@ -2,9 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  // Chemins relatifs : permet de servir l'app depuis n'importe quel sous-dossier
-  // (ex. GitHub Pages : https://<user>.github.io/cdm-2026/).
-  base: './',
+  // Base absolue pour GitHub Pages (https://<user>.github.io/cdm-2026/).
+  // Indispensable pour que les assets se chargent même sans slash final dans l'URL.
+  base: '/cdm-2026/',
   plugins: [react()],
   server: { port: 5173, host: true },
 })
